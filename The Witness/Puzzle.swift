@@ -13,7 +13,9 @@ import Foundation
 
 Node : x and y from 0 ... dimension
 Internode : x and y from 1...dimension
-
+IntersectNode : x and y measured in directional unit,
+    from 1 to dimension on native and from 1 to dimension + 1 on non-native.
+RayMagNode : XInt, YInt from lowest edge.
 ._._._._.
 |*|*|*|*|
 |*|*|*|*|
@@ -24,14 +26,17 @@ Internode : x and y from 1...dimension
  */
 
 class Puzzle{
+    var debug = false;
+    
     var width:Int = 0;
     var height:Int = 0;
     
     var generated:Int = 0;
     
     var nodes = [Node]();
-    var internodes = [Node]();
-    var intermodifiers = [InternodalModifier]();
+    var internodes = [Internode]();
+    var intermodifiers = [Internode:Modifier]();
+    
     var starts = [Node]();
     var endings = [Node]();
     
@@ -94,7 +99,7 @@ class Puzzle{
     }
     
     func modify(position:Node,shape:BlockShape,rotatable:Bool=false){
-        self.intermodifiers.append(InternodalModifier(position:position,modifier:ShapeModifier(shape: shape, rotatable: rotatable)));
+        self.intermodifiers[position] = ShapeModifier(shape: shape, rotatable: rotatable);
     }
     
     func solve(){
@@ -115,7 +120,37 @@ class Puzzle{
             print("Generated: \(generated)");
         }
         
-        path.breakShapes(from:self);
-        return false;
+        let shapes = path.breakShapes(from:self);
+        for shape in shapes{
+            let mods = shape.value.internodes.filter{ self.intermodifiers[$0] != nil }.map{ self.intermodifiers[$0]! }
+            let shapes = mods.filter{ $0.type == .shape };
+            if shapes.count == 1{ //Shape must be the shape.
+                if shape.value.internodes.count != (mods.first! as! ShapeModifier).shape.internodes.count{
+                    if debug{
+                        print("ABORT LINE A");
+                    }
+                    return false;
+                }else{
+                    if shape.value.refactor() == (mods.first! as! ShapeModifier).shape.internodes{
+                        continue;
+                    }else{
+                        if (debug){
+                            print("ABORT LINE B");
+                        }
+                        return false;
+                    }
+                }
+            }else if shapes.count > 1{//Total shape must contain each shape in some way
+                if shapes.reduce(0,{$0 + ($1 as! ShapeModifier).shape.internodes.count}) != shape.value.internodes.count{
+                    if debug{
+                        print("ABORT LINE C");
+                    }
+                    return false;
+                }
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

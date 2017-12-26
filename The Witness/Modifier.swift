@@ -13,8 +13,24 @@ enum modification{
 }
 
 /* shape */
-struct BlockShape{
-    var internodes:[Node];
+struct BlockShape:CustomStringConvertible{
+    var internodes:[Internode];
+    
+    var description: String{
+        return "Shape: " + internodes.description;
+    }
+    
+    func refactor()->[Internode]{
+        //print(internodes);
+        var minx = internodes.min(by: {
+            $0.x <= $1.x
+        })!.x - 1
+        var miny = internodes.min(by: {
+            $0.y <= $1.y
+        })!.y - 1
+        
+        return self.internodes.map{ $0.translate(-minx, -miny)}
+    }
     
     static let dot = BlockShape(internodes:[Node(1,1)]);
     static let threevertical = BlockShape(internodes:[Node(1,1),Node(1,2),Node(1,3)]);
@@ -36,11 +52,15 @@ protocol Modifier{
     
 }
 
-struct ShapeModifier : Modifier{
+struct ShapeModifier : Modifier, CustomStringConvertible{
     let type:modification = .shape;
     
     var shape:BlockShape;
     var rotatable:Bool;
+    
+    var description: String{
+        return "MOD : \(shape)";
+    }
     
     init(shape:BlockShape,rotatable:Bool=false){
         self.shape = shape;

@@ -21,21 +21,21 @@ struct Path:CustomStringConvertible{
         
         var crossed = ([Node](),[Node]());
         
-        print("Parsing path...");
+        //print("Parsing path...");
         for (index, node) in self.nodes.enumerated(){
             if index + 1 >= self.nodes.count{
                 break;
             }
             
             let nextNode = self.nodes[index + 1];
-            print("Parsing node intersect : \(node)->\(nextNode)");
+            //print("Parsing node intersect : \(node)->\(nextNode)");
             
             let intersects = node.intersection(with: nextNode);
             if (intersects.1){
-                print("\tInserting : Vertical \(intersects.0)");
+                //print("\tInserting : Vertical \(intersects.0)");
                 crossed.0.append(intersects.0);
             }else{
-                print("\tInserting : Horizontal \(intersects.0)");
+                //print("\tInserting : Horizontal \(intersects.0)");
                 crossed.1.append(intersects.0);
             }
         }
@@ -74,6 +74,8 @@ struct Path:CustomStringConvertible{
                     
                     if (from.verify(path:path)){
                         print("VERIFIED");
+                        print(path);
+                        //sleep(10);
                         superpolatedPaths.append(path);
                     }
                     
@@ -96,7 +98,7 @@ struct Path:CustomStringConvertible{
         return "Path(" + String(describing:nodes) + ")";
     }
     
-    func breakShapes(from:Puzzle){
+    func breakShapes(from:Puzzle)->[RayMagNode:BlockShape]{
         
         var shapecollection = [RayMagNode:BlockShape]();
         var shapeassoc = [Node:RayMagNode]();
@@ -105,8 +107,8 @@ struct Path:CustomStringConvertible{
         let horizontalCross = crossNode.1;
         let verticalCross = crossNode.0;
         
-        print("Horizontal Crosses: \(horizontalCross)");
-        print("Vertical Crosses: \(verticalCross)");
+        //print("Horizontal Crosses: \(horizontalCross)");
+        //print("Vertical Crosses: \(verticalCross)");
         from.internodes.forEach{ internode in
             let xcrosses = verticalCross.filter{
                 return $0.y == internode.y && $0.x <= internode.x;
@@ -116,7 +118,7 @@ struct Path:CustomStringConvertible{
                 $0.x == internode.x && $0.y <= internode.y;
             }.count
             
-            print("Internode \(internode) crossed x: \(xcrosses), y: \(ycrosses).");
+            //print("Internode \(internode) crossed x: \(xcrosses), y: \(ycrosses).");
             
             let nodalPos:RayMagNode = Node(xcrosses,ycrosses);
             
@@ -134,24 +136,24 @@ struct Path:CustomStringConvertible{
             neighbors.forEach{
                 if shapeassoc[$0] != nil{
                     if shapeassoc[$0] != shapeassoc[internode]{
-                        print("Border check between nodes \(internode) and \($0) :");
+                        //print("Border check between nodes \(internode) and \($0) :");
                         let intersect = internode.intersection(between: $0)
-                        print("\tIntersect position: \(intersect.0)");
+                        //print("\tIntersect position: \(intersect.0)");
                         if intersect.1{
                             if !verticalCross.contains(intersect.0){
                                 rayAssoc[shapeassoc[$0]!] = shapeassoc[internode]!;
-                                print("\tAssociating \(shapeassoc[$0]!) with corrected shape \(shapeassoc[internode]!) through node \($0)")
+                                //print("\tAssociating \(shapeassoc[$0]!) with corrected shape \(shapeassoc[internode]!) through node \($0)")
                             }
                         }else{
                             if !horizontalCross.contains(intersect.0){
                                 rayAssoc[shapeassoc[$0]!] = shapeassoc[internode]!;
-                                print("\tAssociating \(shapeassoc[$0]!) with corrected shape \(shapeassoc[internode]!) through node \($0)")
+                                //print("\tAssociating \(shapeassoc[$0]!) with corrected shape \(shapeassoc[internode]!) through node \($0)")
                             }
                         }
                     }
                 }
             }
-            
+            //URGENT TODO : IF no adjacent tiles from referred shape, new RayMagNode.
             shapecollection[shapeassoc[internode]!]!.internodes.append(internode);
         }
         
@@ -161,12 +163,16 @@ struct Path:CustomStringConvertible{
             
             let master = $0.key;
             slaved.insert($0.value);
-            shapecollection[master]!.internodes += shapecollection[$0.value]!.internodes;
+            if (shapecollection[$0.value] != nil){
+                shapecollection[master]!.internodes += shapecollection[$0.value]!.internodes;
+            }
             shapecollection.removeValue(forKey: $0.value);
         }
-        
+        /*
         for shape in shapecollection{
             print("\(shape.key): \(shape.value.internodes)");
         }
+    */
+        return shapecollection;
     }
 }

@@ -65,14 +65,14 @@ struct Node:Hashable,CustomStringConvertible{
     
     func intersection(with:Node)->(IntersectNode,IsVertical){
         if self.x == with.x{
-            print("\tIntersect Type: Vertical")
+            //print("\tIntersect Type: Vertical")
             if (self.y < with.y){
                 return (with.translate(1,0),true)
             }else{
                 return (self.translate(1,0),true)
             }
         }else{
-            print("\tIntersect Type: Horizontal")
+            //print("\tIntersect Type: Horizontal")
             if (self.x < with.x){
                 return (with.translate(0, 1),false);
             }else{
@@ -83,29 +83,19 @@ struct Node:Hashable,CustomStringConvertible{
     
     func intersection(between with:Internode)->(IntersectNode,IsVertical){
         if self.y == with.y{
-            print("\tIntersect Type: Vertical")
+            //print("\tIntersect Type: Vertical")
             if (self.x < with.x){
                 return (with,true)
             }else{
                 return (self,true)
             }
         }else{
-            print("\tIntersect Type: Horizontal")
+            //print("\tIntersect Type: Horizontal")
             if (self.y < with.y){
                 return (with,false);
             }else{
                 return (self,false);
             }
         }
-    }
-}
-
-struct InternodalModifier{
-    let node:Node;
-    let modifier:Modifier;
-    
-    init(position:Node,modifier:Modifier){
-        self.node = position;
-        self.modifier = modifier;
     }
 }
