@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		283001451FF085D600275C5F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283001441FF085D600275C5F /* main.swift */; };
+		2830014C1FF086B300275C5F /* Puzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2830014B1FF086B300275C5F /* Puzzle.swift */; };
+		2830014E1FF086DF00275C5F /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2830014D1FF086DF00275C5F /* Path.swift */; };
+		283001521FF08CCA00275C5F /* Modifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283001511FF08CCA00275C5F /* Modifier.swift */; };
+		283001541FF091A100275C5F /* Interpreter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283001531FF091A100275C5F /* Interpreter.swift */; };
+		283001561FF2077800275C5F /* Internode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283001551FF2077800275C5F /* Internode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +30,11 @@
 /* Begin PBXFileReference section */
 		283001411FF085D600275C5F /* The Witness */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "The Witness"; sourceTree = BUILT_PRODUCTS_DIR; };
 		283001441FF085D600275C5F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		2830014B1FF086B300275C5F /* Puzzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Puzzle.swift; sourceTree = "<group>"; };
+		2830014D1FF086DF00275C5F /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
+		283001511FF08CCA00275C5F /* Modifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifier.swift; sourceTree = "<group>"; };
+		283001531FF091A100275C5F /* Interpreter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpreter.swift; sourceTree = "<group>"; };
+		283001551FF2077800275C5F /* Internode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Internode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +68,11 @@
 			isa = PBXGroup;
 			children = (
 				283001441FF085D600275C5F /* main.swift */,
+				2830014B1FF086B300275C5F /* Puzzle.swift */,
+				2830014D1FF086DF00275C5F /* Path.swift */,
+				283001551FF2077800275C5F /* Internode.swift */,
+				283001511FF08CCA00275C5F /* Modifier.swift */,
+				283001531FF091A100275C5F /* Interpreter.swift */,
 			);
 			path = "The Witness";
 			sourceTree = "<group>";
@@ -120,7 +135,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				283001541FF091A100275C5F /* Interpreter.swift in Sources */,
 				283001451FF085D600275C5F /* main.swift in Sources */,
+				2830014E1FF086DF00275C5F /* Path.swift in Sources */,
+				283001561FF2077800275C5F /* Internode.swift in Sources */,
+				2830014C1FF086B300275C5F /* Puzzle.swift in Sources */,
+				283001521FF08CCA00275C5F /* Modifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
