@@ -98,4 +98,20 @@ struct Node:Hashable,CustomStringConvertible{
             }
         }
     }
+    
+    func direction(to: Node)->Path.direction{
+        if (self.x == to.x){
+            if self.y < to.y{
+                return Path.direction.up;
+            }else{
+                return Path.direction.down;
+            }
+        }else{
+            if self.x < to.x{
+                return Path.direction.right;
+            }else{
+                return Path.direction.left;
+            }
+        }
+    }
 }

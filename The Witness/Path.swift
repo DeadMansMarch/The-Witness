@@ -10,7 +10,15 @@ import Foundation
 
 typealias IsVertical = Bool
 
-struct Path:CustomStringConvertible{
+struct Path:CustomStringConvertible, Hashable{
+    
+    static func ==(_ a: Path,_ b: Path)->Bool{
+        return Set<Node>(a.nodes) == Set<Node>(b.nodes);
+    }
+    
+    var hashValue: Int{
+        return nodes.reduce(0,{ $0 + $1.hashValue });
+    }
     
     var nodes = [Node]();
     
@@ -63,22 +71,17 @@ struct Path:CustomStringConvertible{
         }
     }
     
-    func superpolate(from:Puzzle,to ending:[Node])->[Path]{
-        var superpolatedPaths = [Path]();
+    func superpolate(from:Puzzle,to ending:[Node],verify:(Path)->Bool){
         var extrapolatedPaths = self.extrapolate(from: from);
         
         while true{
             var intrapolate = [Path]();
             for path in extrapolatedPaths{
                 if ending.contains(path.nodes.last!){
-                    
-                    if (from.verify(path:path)){
+                    if (verify(path)){
                         print("VERIFIED");
                         print(path);
-                        //sleep(10);
-                        superpolatedPaths.append(path);
                     }
-                    
                 }else{
                     intrapolate += path.extrapolate(from: from);
                 }
@@ -90,8 +93,29 @@ struct Path:CustomStringConvertible{
             
             extrapolatedPaths = intrapolate;
         }
-        
-        return superpolatedPaths;
+    }
+    
+    func subpath(from:Int,to:Int)->Path{
+        return Path(nodes: [Node](self.nodes[from...to]))
+    }
+    
+    func subpath(count:Int)->Path{
+        return subpath(from:0,to:count - 1);
+    }
+    
+    enum direction:String{
+        case up="up",down="down",left="left",right="right"
+    }
+    
+    var readerDescription: String{
+        var rDescription = "";
+        for (index,node) in self.nodes.enumerated(){
+            if (index + 1 == self.nodes.count){
+                break;
+            }
+            rDescription += " \(node.direction(to: nodes[index + 1])), "
+        }
+        return rDescription
     }
     
     var description: String{

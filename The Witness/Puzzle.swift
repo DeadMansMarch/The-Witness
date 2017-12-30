@@ -102,16 +102,33 @@ class Puzzle{
         self.intermodifiers[position] = ShapeModifier(shape: shape, rotatable: rotatable);
     }
     
-    func solve(){
-        generated = 0;
+    func makeStartingPaths()->[Path]{
         var activePaths = [Path]();
         for start in starts{
             activePaths.append(Path(nodes: [start]));
         }
+        return activePaths;
+    }
+    
+    func solve(){
+        generated = 0;
         
-        activePaths.forEach{
-            $0.superpolate(from: self, to: endings);
+        
+        self.makeStartingPaths().forEach{
+            $0.superpolate(from: self, to: endings,verify:self.verify);
         }
+    }
+    
+    func generate(){
+        generated = 0;
+        self.makeStartingPaths().forEach{
+            $0.superpolate(from: self, to: endings,verify:{ path in
+                generated += 1;
+                print("Path \(generated), \(path.readerDescription)");
+                return false;
+            });
+        }
+        print("Generated : \(generated)");
     }
     
     func verify(path:Path)->Bool{
@@ -123,7 +140,10 @@ class Puzzle{
         let shapes = path.breakShapes(from:self);
         for shape in shapes{
             let mods = shape.value.internodes.filter{ self.intermodifiers[$0] != nil }.map{ self.intermodifiers[$0]! }
+            
             let shapes = mods.filter{ $0.type == .shape };
+            let blocks = mods.filter{ $0.type == .block };
+            let stars = mods.filter{ $0.type == .star };
             if shapes.count == 1{ //Shape must be the shape.
                 if shape.value.internodes.count != (mods.first! as! ShapeModifier).shape.internodes.count{
                     if debug{
@@ -131,7 +151,9 @@ class Puzzle{
                     }
                     return false;
                 }else{
-                    if shape.value.refactor() == (mods.first! as! ShapeModifier).shape.internodes{
+                    //print("Start: \(shape.value), End: \(shape.value.refactor())")
+                    //print(Set<Internode>(shape.value.refactor()),Set<Internode>((mods.first! as! ShapeModifier).shape.internodes))
+                    if Set<Internode>(shape.value.refactor()) == Set<Internode>((mods.first! as! ShapeModifier).shape.internodes){
                         continue;
                     }else{
                         if (debug){
@@ -146,8 +168,55 @@ class Puzzle{
                         print("ABORT LINE C");
                     }
                     return false;
+                }else{
+                    var shapebin = shapes;
+                    
+                    var cascadeIteration = 0;
+                    func cascading(remaining:[Internode],shapes:[ShapeModifier])->Bool{
+                        cascadeIteration += 1;
+                        var shapeRemainder = shapes;
+                        //print("Arrived at cascade : \(shapes.count) remaining.");
+                        
+                        let localshape = shapeRemainder.popLast();
+                        guard let lshape = localshape else{
+                            //print("Found acceptable placement for all modifiers!");
+                            //print("<-Going up");
+                            return true; //Bottom level.
+                        }
+                        
+                        let fitdata = lshape.shape.fits(in: shape.value.internodes);
+                        //print("Fit data returned : \(fitdata.count) possible fit points.");
+                        for internodeList in fitdata.values{
+                            //print("Going down->");
+                            if (cascading(remaining:remaining.filter{ !internodeList.contains($0) },shapes:shapeRemainder)){
+                                return true;
+                            }
+                        }
+                        //print("<-Going up");
+                        return false;
+                    }
+                    
+                    //print("Cascade start.");
+                    let cascadedResult = cascading(remaining:shape.value.internodes,shapes:shapebin as! [ShapeModifier]);
+                    
+                    if debug && !cascadedResult{
+                        print("ABORT LINE D");
+                    }
+                    if (!cascadedResult){
+                        return false;
+                    }
+                    return false;
                 }
-                return false;
+            }
+            
+            if blocks.count > 1{
+                let activeColor = (blocks.first! as! BlockModifier).color
+                for block in blocks{
+                    if (block as! BlockModifier).color != activeColor{
+                        print("ABORT LINE E");
+                        return false
+                    }
+                }
             }
         }
         
