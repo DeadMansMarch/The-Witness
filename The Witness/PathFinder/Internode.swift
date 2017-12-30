@@ -34,22 +34,28 @@ struct Node:Hashable,CustomStringConvertible{
         return "(\(x), \(y))";
     }
     
-    func neighbors(from:Puzzle)->[Node]{
+    func neighbors(from map:Map)->[Node]{
         var neighbors = [Node]();
-        if (x > 0){
-            neighbors.append(Node(x - 1,y));
+        
+        let xLeft = Node(x - 1,y);
+        let xRight = Node(x + 1,y);
+        let yUp = Node(x,y + 1);
+        let yDown = Node(x,y - 1);
+        
+        if (map.internodes.contains(xLeft)){
+            neighbors.append(xLeft);
         }
         
-        if (y > 0){
-            neighbors.append(Node(x,y - 1));
+        if (map.nodes.contains(xRight)){
+            neighbors.append(xRight);
         }
         
-        if (x < from.width){
-            neighbors.append(Node(x + 1,y));
+        if (map.nodes.contains(yUp)){
+            neighbors.append(yUp);
         }
         
-        if (y < from.height){
-            neighbors.append(Node(x,y + 1));
+        if (map.nodes.contains(yDown)){
+            neighbors.append(yDown);
         }
         
         return neighbors;
@@ -113,5 +119,9 @@ struct Node:Hashable,CustomStringConvertible{
                 return Path.direction.left;
             }
         }
+    }
+    
+    func asPath()->Path{
+        return Path(nodes: [self])
     }
 }

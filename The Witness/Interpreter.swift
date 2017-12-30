@@ -24,7 +24,7 @@ class Interpreter{
             return nil;
         }
         
-        let split = coor.trimmingCharacters(in: CharacterSet(charactersIn:"0123456789").inverted).split(separator:",");
+        let split = coor.trimmingCharacters(in: CharacterSet(charactersIn:"0123456789,").inverted).split(separator:",");
         
         guard split.count == 2 else{
             return Interpreter.readNode();

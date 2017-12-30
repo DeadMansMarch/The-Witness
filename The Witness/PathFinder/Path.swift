@@ -61,38 +61,36 @@ struct Path:CustomStringConvertible, Hashable{
         }
     }
     
-    func extrapolate(from:Puzzle)->[Path]{
-        let extrafrom = nodes.last!
-        let newpaths = extrafrom.neighbors(from:from).filter{!self.nodes.contains($0)};
-        return newpaths.map{ node -> Path in
-            var localNodes = self.nodes;
-            localNodes.append(node);
-            return Path(nodes: localNodes);
+    func extended(by node:Node)->Path{
+        var newPath = Path(nodes:self.nodes);
+        newPath.nodes.append(node);
+        return newPath;
+    }
+    
+    func extrapolate(from map:Map)->[Path]{
+        let currentEnding = nodes.last!
+        let neighborNodes = currentEnding.neighbors(from:map).filter{!self.nodes.contains($0)};
+        return neighborNodes.map{
+            self.extended(by:$0);
         }
     }
     
-    func superpolate(from:Puzzle,to ending:[Node],verify:(Path)->Bool){
-        var extrapolatedPaths = self.extrapolate(from: from);
+    func superpolate(from map:Map,leadingPath:Path,to ending:Node,verify callback:(Path)->Bool){
+        var extrapolatedPaths = leadingPath.extrapolate(from: map);
         
-        while true{
-            var intrapolate = [Path]();
-            for path in extrapolatedPaths{
-                if ending.contains(path.nodes.last!){
-                    if (verify(path)){
-                        print("VERIFIED");
-                        print(path);
-                    }
-                }else{
-                    intrapolate += path.extrapolate(from: from);
+        for path in extrapolatedPaths{
+            if path.nodes.last! == ending{
+                if (callback(path)){
+                    print(path);
                 }
+            }else{
+                path.superpolate(from: map, leadingPath: path, to: ending, verify: callback)
             }
-            
-            if intrapolate.count == 0{
-                break;
-            }
-            
-            extrapolatedPaths = intrapolate;
         }
+    }
+    
+    func superpolate(from map:Map,to ending:Node,verify callback:(Path)->Bool){
+        self.superpolate(from:map,leadingPath:self,to:ending,verify:callback)
     }
     
     func subpath(from:Int,to:Int)->Path{
@@ -122,7 +120,7 @@ struct Path:CustomStringConvertible, Hashable{
         return "Path(" + String(describing:nodes) + ")";
     }
     
-    func breakShapes(from:Puzzle)->[RayMagNode:BlockShape]{
+    func breakShapes(from:Map)->[RayMagNode:BlockShape]{
         
         var shapecollection = [RayMagNode:BlockShape]();
         var shapeassoc = [Node:RayMagNode]();
@@ -178,6 +176,7 @@ struct Path:CustomStringConvertible, Hashable{
                 }
             }
             //URGENT TODO : IF no adjacent tiles from referred shape, new RayMagNode.
+            //Two shapes on same x y cast will be grouped incorrectly...
             shapecollection[shapeassoc[internode]!]!.internodes.append(internode);
         }
         
